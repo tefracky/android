@@ -2,8 +2,10 @@
 
 local.properties
 google-services.json
+build.gradle.kts
 
 *.iml
 .idea/
 .gradle/
 build/
+/Sign-Key-Alt.jks

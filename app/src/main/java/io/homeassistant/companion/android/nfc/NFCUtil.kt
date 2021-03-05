@@ -10,6 +10,7 @@ import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.nfc.tech.NdefFormatable
+import android.util.Log
 import io.homeassistant.companion.android.BuildConfig
 import java.io.IOException
 
@@ -50,7 +51,7 @@ object NFCUtil {
         fallbackMessage: NdefMessage,
         tag: Tag?
     ): Boolean {
-        val nDefTag = Ndef.get(tag)
+        val nDefTag: Ndef? = Ndef.get(tag)
 
         nDefTag?.let {
             it.connect()
@@ -82,6 +83,11 @@ object NFCUtil {
                 // The data is written to the tag
             } catch (e: IOException) {
                 // Failed to format tag
+                Log.d("nfcMessage", "nfcMessage = $nfcMessage")
+                Log.d("fallbackMessage", "fallbackMessage = $fallbackMessage")
+                Log.d("tag", "tag = ${tag.toString()}")
+                Log.d("nDefTag", "nDefTag = ${nDefTag.toString()}")
+                Log.d("nDefFormatableTag", "nDefFormatableTag = $nDefFormatableTag")
                 throw Exception("Failed to format tag", e)
             }
         }
