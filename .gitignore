@@ -9,3 +9,4 @@ build.gradle.kts
 .gradle/
 build/
 /Sign-Key-Alt.jks
+/app/full/debug/app-full-debug.aab

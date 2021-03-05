@@ -79,37 +79,57 @@ class NfcSetupActivity : BaseActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        Log.d("NFC Debug", "NFC Debug\n\n\n\n\n\n\n\n\n\nStart")
+        Log.d("NFC Debug", "intent = $intent")
+        Log.d("NFC Debug", ("NfcAdapter.ACTION_TECH_DISCOVERED == intent.action = " + NfcAdapter.ACTION_TECH_DISCOVERED == intent.action).toString())
 
         if (NfcAdapter.ACTION_TECH_DISCOVERED == intent.action) {
             val nfcTagToWriteUUID = viewModel.nfcWriteTagEvent.value
+            Log.d("NFC Debug", "nfcTagToWriteUUID = $nfcTagToWriteUUID")
 
             // Create new nfc tag
             if (nfcTagToWriteUUID == null) {
+                Log.d("NFC Debug", "nfcTagToWriteUUID = null")
                 val rawMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                Log.d("NFC Debug", "rawMessages = $rawMessages")
                 val ndefMessage = rawMessages?.firstOrNull() as NdefMessage?
+                Log.d("NFC Debug", "ndefMessage = $ndefMessage")
                 val url = ndefMessage?.records?.get(0)?.toUri().toString()
+                Log.d("NFC Debug", "url = $url")
                 val nfcTagId = UrlHandler.splitNfcTagId(url)
+                Log.d("NFC Debug", "nfcTagId = $nfcTagId")
                 if (nfcTagId == null) {
+                    Log.d("NFC Debug", "nfcTagId = null")
                     Log.w(TAG, "Unable to read tag!")
                     Toast.makeText(this, R.string.nfc_invalid_tag, Toast.LENGTH_LONG).show()
                 } else {
-                    viewModel.nfcReadEvent.postValue(nfcTagId)
+                    Log.d("NFC Debug", "nfcTagId != null")
+                    val value = viewModel.nfcReadEvent.postValue(nfcTagId)
+                    Log.d("NFC Debug", "value = $value")
                 }
             } else {
+                Log.d("NFC Debug", "nfcTagToWriteUUID != null")
                 try {
                     val nfcTagUrl = "https://www.home-assistant.io/tag/$nfcTagToWriteUUID"
-                    NFCUtil.createNFCMessage(nfcTagUrl, intent)
+                    Log.d("NFC Debug", "nfcTagUrl = $nfcTagUrl")
+                    val ret = NFCUtil.createNFCMessage(nfcTagUrl, intent)
+                    Log.d("NFC Debug", "ret = $ret")
                     Log.d(TAG, "Wrote nfc tag with url: $nfcTagUrl")
                     val message = R.string.nfc_write_tag_success
                     Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
 
                     viewModel.nfcReadEvent.value = nfcTagToWriteUUID
+                    Log.d("NFC Debug", " viewModel.nfcReadEvent.value = " +  viewModel.nfcReadEvent.value)
                     viewModel.nfcWriteTagDoneEvent.value = nfcTagToWriteUUID
+                    Log.d("NFC Debug", " viewModel.nfcWriteTagDoneEvent.value = " +  viewModel.nfcWriteTagDoneEvent.value)
                     // If we are a simple write it means the fontend asked us to write.  This means
                     // we should return the user as fast as possible back to the UI to continue what
                     // they were doing!
+                    Log.d("NFC Debug", "nfcTagUrl = $nfcTagUrl")
                     if (simpleWrite) {
-                        setResult(messageId)
+                        Log.d("NFC Debug", "simpleWrite = $simpleWrite")
+                        val res = setResult(messageId)
+                        Log.d("NFC Debug", "res = $res")
                         finish()
                     }
                 } catch (e: Exception) {
@@ -117,6 +137,7 @@ class NfcSetupActivity : BaseActivity() {
                     Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
                     Log.e(TAG, "Unable to write tag.", e)
                 }
+                Log.d("NFC Debug", "NFC Debug\n\n\n\n\n\n\n\n\n\nEnd")
             }
         }
     }
